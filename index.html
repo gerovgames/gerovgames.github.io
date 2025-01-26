@@ -5,28 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coming Soon</title>
     <link href="https://fonts.cdnfonts.com/css/electronic-highway-sign" rel="stylesheet">
-    <style>
-        body {
-            background-color: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Electronic Highway Sign', sans-serif;
-        }
-
-        .coming-soon {
-            color: white;
-            font-size: 6vw;
-            text-align: center;
-            letter-spacing: 5px;
-        }
-    </style>
+    <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-    <div class="coming-soon">
+    <div class="coming-soon neon-text cursor typewriter-animation" data-text="coming soon">
         COMING SOON
     </div>
+    <script>
+        let textWrapper = document.querySelector('.coming-soon'); 
+
+        textWrapper.addEventListener('animationend', function() {
+            this.classList.remove('cursor', 'typewriter-animation');
+        })
+    </script>
 </body>
 </html>

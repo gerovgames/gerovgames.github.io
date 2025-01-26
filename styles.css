@@ -1,0 +1,67 @@
+body {
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Electronic Highway Sign', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.coming-soon {
+    color: white;
+    font-size: 6vw;
+    text-align: center;
+    letter-spacing: 5px;
+    border-right: 2px solid transparent;
+}
+.neon-text {
+    position: relative;
+    z-index: 10;
+}
+.neon-text::before {
+    content: attr(data-text);
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    color: #bf4080;
+    width: 100%;
+    height: 100%;
+    animation: animateTextColor 3s infinite linear;
+    -webkit-text-stroke: 1px #bf4080;
+    z-index: -1;
+}
+@keyframes animateTextColor {
+    0% {
+        color: #00b4d8;
+   }
+    20% {
+        color: #bf4080;
+   }
+    50% {
+        color: #6f2ed8;
+   }
+    60% {
+        color: #00b4d8;
+   }
+    80% {
+        color: #6f2ed8;
+   }
+    100% {
+        color: #00b4d8;
+   }
+}
+.cursor{
+    position: relative;
+    border-right: 2px solid rgba(255,255,255,.75);
+    white-space: nowrap;
+    overflow: hidden;  
+}
+.typewriter-animation {
+  animation: typewriter 3s steps(25) 1s 1 normal both;
+}
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
