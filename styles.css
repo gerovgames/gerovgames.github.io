@@ -15,6 +15,7 @@ body {
     text-align: center;
     letter-spacing: 5px;
     border-right: 2px solid transparent;
+    line-height: 140%;
 }
 .neon-text {
     position: relative;
@@ -59,9 +60,23 @@ body {
     overflow: hidden;  
 }
 .typewriter-animation {
-  animation: typewriter 3s steps(25) 1s 1 normal both;
+    animation: typewriter 3s steps(25) 1s 1 normal both;
 }
 @keyframes typewriter {
-  from { width: 0; }
-  to { width: 100%; }
+    from { 
+        width: 0; 
+    }
+    to { 
+        width: 100%; 
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .coming-soon {
+        font-size: 10vw;
+    }
+    .neon-text::before {
+        bottom: 3px;
+        right: 3px;
+    }
 }
