@@ -14,12 +14,21 @@ body {
     font-size: 6vw;
     text-align: center;
     letter-spacing: 5px;
-    border-right: 2px solid transparent;
     line-height: 140%;
 }
+.coming-soon.cursor:after {
+    content: '';
+    height: 80%; 
+    width: 2px;
+    position: absolute;
+    right: 0px;
+    top: 0;
+    background-color: rgba(255,255,255,.75);
+  }
 .neon-text {
     position: relative;
     z-index: 10;
+    border-right: 2px solid transparent;
 }
 .neon-text::before {
     content: attr(data-text);
@@ -33,6 +42,7 @@ body {
     -webkit-text-stroke: 1px #bf4080;
     z-index: -1;
 }
+
 @keyframes animateTextColor {
     0% {
         color: #00b4d8;
@@ -55,7 +65,6 @@ body {
 }
 .cursor {
     position: relative;
-    border-right: 2px solid rgba(255,255,255,.75);
     white-space: nowrap;
     overflow-x: hidden;  
 }
