@@ -24,7 +24,8 @@ body {
     right: 0px;
     top: 0;
     background-color: rgba(255,255,255,.75);
-  }
+    animation: cursor-hide-desktop 3s steps(25) 1s 1 normal both;
+}
 .neon-text {
     position: relative;
     z-index: 10;
@@ -79,6 +80,22 @@ body {
         width: 100%; 
     }
 }
+@keyframes cursor-hide-desktop {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+@keyframes cursor-hide-mobile {
+    0%, 85% {
+        opacity: 1;
+    }
+    86%, 100% {
+        opacity: 0;
+    }
+}
 
 @media screen and (max-width: 767px) {
     .coming-soon {
@@ -87,5 +104,8 @@ body {
     .neon-text::before {
         bottom: 3px;
         right: 3px;
+    }
+    .coming-soon.cursor:after {
+        animation: cursor-hide-mobile 3s steps(25) 1s 1 normal both;
     }
 }
