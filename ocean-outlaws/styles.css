@@ -100,29 +100,10 @@ body {
         opacity: 0;
     }
 }
-img {
-    max-width: 100%;
-    height: auto;
-}
-.running-player {
-    display: none;
+canvas {
     position: absolute;
-    bottom: 0;
-    width: 80px;
-    left: 0;
 }
-.running-player.animate {
-    display: block;
-    animation: leftToRight 3s linear;
-}
-@keyframes leftToRight {
-    from {
-        transform: translateX(calc(0vw - 100%));
-    }
-    to {
-        transform: translateX(calc(100vw + 100%));
-    }
-}
+
 @media screen and (max-width: 767px) {
     .coming-soon {
         font-size: 10vw;
@@ -133,9 +114,5 @@ img {
     }
     .coming-soon.cursor:after {
         animation: cursor-hide-mobile 3s steps(25) 1s 1 normal both;
-    }
-    .running-player.animate {
-        display: block;
-        animation: leftToRight 2s linear;
     }
 }

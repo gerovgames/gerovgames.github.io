@@ -18,25 +18,10 @@
 
         textWrapper.addEventListener('animationend', function () {
             this.classList.remove('cursor', 'typewriter-animation');
-        });
-
-        function getIntervalTime() {
-            return window.innerWidth < 767 ? 4000 : 3000; 
-        }
-
-        let intervalTime = getIntervalTime();
-
-        setInterval(() => {
             playerGif.classList.add('animate');
-
-            playerGif.addEventListener('animationend', function intervalAnimationEnd() {
-                playerGif.classList.remove('animate');
-                playerGif.removeEventListener('animationend', intervalAnimationEnd);
-            });
-        }, intervalTime);
-
-        window.addEventListener('resize', function() {
-            intervalTime = getIntervalTime();
+        });
+        playerGif.addEventListener('animationend', function () {
+            playerGif.classList.remove('animate');
         });
     </script>
 </body>
