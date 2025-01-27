@@ -11,12 +11,33 @@
     <div class="coming-soon neon-text cursor typewriter-animation" data-text="coming soon">
         COMING SOON
     </div>
+    <img src="2dplayer.gif" alt="2D Player" class="running-player">
     <script>
-        let textWrapper = document.querySelector('.coming-soon'); 
+        let textWrapper = document.querySelector('.coming-soon');
+        let playerGif = document.querySelector('.running-player');
 
-        textWrapper.addEventListener('animationend', function() {
+        textWrapper.addEventListener('animationend', function () {
             this.classList.remove('cursor', 'typewriter-animation');
-        })
+        });
+
+        function getIntervalTime() {
+            return window.innerWidth < 767 ? 4000 : 3000; 
+        }
+
+        let intervalTime = getIntervalTime();
+
+        setInterval(() => {
+            playerGif.classList.add('animate');
+
+            playerGif.addEventListener('animationend', function intervalAnimationEnd() {
+                playerGif.classList.remove('animate');
+                playerGif.removeEventListener('animationend', intervalAnimationEnd);
+            });
+        }, intervalTime);
+
+        window.addEventListener('resize', function() {
+            intervalTime = getIntervalTime();
+        });
     </script>
 </body>
 </html>
