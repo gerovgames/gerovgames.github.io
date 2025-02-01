@@ -1,14 +1,21 @@
+@font-face {
+    font-family: 'TheRumIsGone';
+    src: url('therumisgone-webfont.woff2') format('woff2'),
+         url('therumisgone-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
 html {
     overflow-x: hidden;
 }
 body {
-    background-color: black;
+    background-color: #87ceeb;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
-    font-family: 'Electronic Highway Sign', sans-serif;
+    font-family: 'TheRumIsGone', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -19,16 +26,11 @@ body {
     text-align: center;
     letter-spacing: 5px;
     line-height: 140%;
+    opacity: 0;
 }
-.coming-soon.cursor:after {
-    content: '';
-    height: 80%; 
-    width: 2px;
-    position: absolute;
-    right: 0px;
-    top: 0;
-    background-color: rgba(255,255,255,.75);
-    animation: cursor-hide-desktop 3s steps(25) 1s 1 normal both;
+.coming-soon.active {
+    -webkit-animation: 2s fadeInUp forwards;
+    animation: 2s fadeInUp forwards;
 }
 .neon-text {
     position: relative;
@@ -38,81 +40,49 @@ body {
 .neon-text::before {
     content: attr(data-text);
     position: absolute;
-    bottom: 5px;
-    right: 5px;
-    color: #bf4080;
+    bottom: 0px;
+    right: 0px;
+    color: #000;
     width: 100%;
     height: 100%;
-    animation: animateTextColor 3s infinite linear;
-    -webkit-text-stroke: 1px #bf4080;
     z-index: -1;
-}
-
-@keyframes animateTextColor {
-    0% {
-        color: #00b4d8;
-   }
-    20% {
-        color: #bf4080;
-   }
-    50% {
-        color: #6f2ed8;
-   }
-    60% {
-        color: #00b4d8;
-   }
-    80% {
-        color: #6f2ed8;
-   }
-    100% {
-        color: #00b4d8;
-   }
-}
-.cursor {
-    position: relative;
-    white-space: nowrap;
-    overflow-x: hidden;  
-}
-.typewriter-animation {
-    animation: typewriter 3s steps(25) 1s 1 normal both;
-}
-@keyframes typewriter {
-    from { 
-        width: 0; 
-    }
-    to { 
-        width: 100%; 
-    }
-}
-@keyframes cursor-hide-desktop {
-    0%, 50% {
-        opacity: 1;
-    }
-    51%, 100% {
-        opacity: 0;
-    }
-}
-@keyframes cursor-hide-mobile {
-    0%, 85% {
-        opacity: 1;
-    }
-    86%, 100% {
-        opacity: 0;
-    }
 }
 canvas {
     position: absolute;
 }
+@-webkit-keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        -webkit-transform: translateY(100px);
+        transform: translateY(100px);
+    }
+  
+    to {
+        opacity: 1;
+        -webkit-transform: translateY(0);
+        transform: translateY(0)
+    }
+}
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        -webkit-transform: translateY(100px);
+        transform: translateY(100px);
+    }
+
+    to {
+        opacity: 1;
+        -webkit-transform: translateY(0);
+        transform: translateY(0)
+    }
+}
 
 @media screen and (max-width: 767px) {
     .coming-soon {
-        font-size: 10vw;
+        font-size: 15vw;
     }
     .neon-text::before {
         bottom: 3px;
         right: 3px;
-    }
-    .coming-soon.cursor:after {
-        animation: cursor-hide-mobile 3s steps(25) 1s 1 normal both;
     }
 }

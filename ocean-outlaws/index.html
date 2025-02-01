@@ -1,71 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coming Soon</title>
-    <link href="https://fonts.cdnfonts.com/css/electronic-highway-sign" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-</head>
-<body>
-    <script>
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-    
-        const light = new THREE.PointLight(0xffffff, 1, 100);
-        light.position.set(-10, 10, 10);
-        scene.add(light);
-    
-        const loader = new THREE.GLTFLoader();
-        let ship;
-    
-        loader.load('BattleShip.glb', (gltf) => {
-            ship = gltf.scene;
-            scene.add(ship);
-    
-            if (window.innerWidth <= 767) {
-                ship.scale.set(1.7, 1.7, 1.7);
-            } else {
-                ship.scale.set(2, 2, 2);
-            }
-    
-            ship.position.set(10, 0, 0);
-    
-            animateShip();
-        });
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Coming Soon</title>
+        <link href="styles.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Water.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    </head>
+    <body>
+        <script>
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
 
-        camera.position.set(0, 5, 5);
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(-10, 10, 10); 
+            scene.add(light);
 
-        function animateShip() {
-            gsap.to(ship.position, {
-                x: 0,
-                duration: 3,
-                ease: "power2.out",
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            const skyLoader = new THREE.CubeTextureLoader();
+            const skyboxTexture = skyLoader.load([
+                'skybox/px.jpg', 
+                'skybox/nx.jpg', 
+                'skybox/py.jpg', 
+                'skybox/ny.jpg', 
+                'skybox/pz.jpg', 
+                'skybox/nz.jpg', 
+            ]);
+
+            scene.background = skyboxTexture;
+
+            const waterGeometry = new THREE.PlaneGeometry(500, 500);
+            const water = new THREE.Water(waterGeometry, {
+                textureWidth: 512,
+                textureHeight: 512,
+                waterNormals: new THREE.TextureLoader().load(
+                    'https://threejs.org/examples/textures/waternormals.jpg',
+                    (texture) => {
+                        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    }
+                ),
+                sunDirection: new THREE.Vector3(),
+                sunColor: 0xffffff,
+                waterColor: 0x001e0f,
+                distortionScale: 1,
+                fog: false,
             });
-    
-            animate();
-        }
-    
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-        }
-    </script>
-    
-    <div class="coming-soon neon-text cursor typewriter-animation" data-text="coming soon">
-        COMING SOON
-    </div>
-    <script>
-        let textWrapper = document.querySelector('.coming-soon');
-        textWrapper.addEventListener('animationend', function () {
-            this.classList.remove('cursor', 'typewriter-animation');
-        });
-    </script>
-</body>
+            water.rotation.x = -Math.PI / 2;
+            water.position.y = -2;
+            scene.add(water);
+
+            const loader = new THREE.GLTFLoader();
+            let ship;
+            loader.load('BattleShip.glb', (gltf) => {
+                ship = gltf.scene;
+                scene.add(ship);
+                ship.scale.set(2, 2, 2);
+                ship.position.set(0, -3, -200);
+
+                animateShip();
+            });
+
+            camera.position.set(0, 5, 10);
+            camera.lookAt(0, 0, 0);
+
+            const targetZ = 50; 
+
+            function animateShip() {
+                gsap.to(ship.position, {
+                    z: targetZ,
+                    duration: 20, 
+                    onUpdate: () => {
+                        updateShipFloating(); 
+                        if (ship.position.z >= 0) {
+                            fadeUpText();
+                        }
+                    },
+                    onComplete: () => {
+                        gsap.ticker.add(updateShipFloating); 
+                        scene.remove(ship);
+                        if (wakeParticles) {
+                            scene.remove(wakeParticles);
+                            wakeParticles.geometry.dispose();
+                            wakeParticles.material.dispose();
+                        }
+                        
+                    }
+                });
+
+                animate();
+            }
+
+            function updateShipFloating() {
+                if (!ship) return;
+
+                const time = Date.now() * 0.001; 
+
+                ship.position.y = -3.3 + Math.sin(time * 1.5) * 0.4;
+                ship.rotation.z = Math.sin(time) * 0.05;
+                ship.rotation.x = Math.cos(time * 0.7) * 0.03;
+            }
+
+            function createWakeEffect() {
+
+                const particleCount = 3000;
+                const particles = new THREE.BufferGeometry();
+                const positions = new Float32Array(particleCount * 3);
+                const sizes = new Float32Array(particleCount);
+                const opacities = new Float32Array(particleCount);
+                const lifetimes = new Float32Array(particleCount);
+                const velocities = new Float32Array(particleCount * 3);
+
+                for(let i = 0; i < particleCount; i++) {
+                    positions[i * 3] = 0;
+                    positions[i * 3 + 1] = -2;
+                    positions[i * 3 + 2] = 0;
+                    sizes[i] = 0.2;
+                    opacities[i] = 0;
+                    lifetimes[i] = 0;
+
+                    velocities[i * 3] = 0;
+                    velocities[i * 3 + 1] = 0;
+                    velocities[i * 3 + 2] = 0;
+                }
+
+                particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                particles.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+                particles.setAttribute('opacity', new THREE.BufferAttribute(opacities, 1));
+                particles.setAttribute('lifetime', new THREE.BufferAttribute(lifetimes, 1));
+
+                particles.userData = { velocities: velocities };
+
+                const particleMaterial = new THREE.ShaderMaterial({
+                    uniforms: {
+                        particleTexture: { 
+                            value: new THREE.TextureLoader().load('WaterTrailTexture.png') 
+                        }
+                    },
+                    vertexShader: `
+                        attribute float size;
+                        attribute float opacity;
+                        varying float vOpacity;
+
+                        void main() {
+                            vOpacity = opacity;
+                            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                            gl_PointSize = size * (300.0 / -mvPosition.z);
+                            gl_Position = projectionMatrix * mvPosition;
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform sampler2D particleTexture;
+                        varying float vOpacity;
+
+                        void main() {
+                            vec4 texColor = texture2D(particleTexture, gl_PointCoord);
+
+                            vec3 tintColor = vec3(0.99, 0.99, 0.99); 
+                            gl_FragColor = vec4(texColor.rgb * tintColor, texColor.a * vOpacity * 0.3); 
+                        }
+                    `,
+                    transparent: true,
+                    depthWrite: false,
+                    blending: THREE.AdditiveBlending
+                });
+
+                const particleSystem = new THREE.Points(particles, particleMaterial);
+                scene.add(particleSystem);
+
+                return particleSystem;
+            }
+
+            const wakeParticles = createWakeEffect();
+
+            function updateWakeParticles() {
+                if (!ship) return;
+
+                const positions = wakeParticles.geometry.attributes.position.array;
+                const sizes = wakeParticles.geometry.attributes.size.array;
+                const opacities = wakeParticles.geometry.attributes.opacity.array;
+                const lifetimes = wakeParticles.geometry.attributes.lifetime.array;
+                const velocities = wakeParticles.geometry.userData.velocities;
+
+                const shipPos = new THREE.Vector3();
+                ship.getWorldPosition(shipPos);
+
+                const shipDirection = new THREE.Vector3(0, 0, -1);
+                shipDirection.applyQuaternion(ship.quaternion);
+
+                for(let i = 0; i < positions.length / 3; i++) {
+                    if(lifetimes[i] <= 0) {
+                        const shipLength = 3; 
+                        const forwardOffset = 2; 
+
+                        const angle = (Math.random() - 0.5) * Math.PI * 1.8; 
+                        const distance = 1 + Math.random() * 1; 
+
+                        const randomOffset = (Math.random() * shipLength - shipLength / 2);
+
+                        positions[i * 3] = shipPos.x + 
+                                        Math.cos(angle) * distance + 
+                                        randomOffset * shipDirection.x;
+                        positions[i * 3 + 1] = -2 + Math.random() * 0.3; 
+                        positions[i * 3 + 2] = shipPos.z + 
+                                        Math.sin(angle) * distance + 
+                                        randomOffset * shipDirection.z + 
+                                        forwardOffset; 
+
+                        velocities[i * 3] = (Math.random() - 0.5) * 0.03;     
+                        velocities[i * 3 + 1] = -0.002;                       
+                        velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.03; 
+
+                        sizes[i] = 0.5 + Math.random() * 1.0; 
+                        opacities[i] = 0.4 + Math.random() * 0.3; 
+                        lifetimes[i] = 1.5 + Math.random(); 
+                    } else {
+
+                        positions[i * 3] += velocities[i * 3];
+                        positions[i * 3 + 1] += velocities[i * 3 + 1];
+                        positions[i * 3 + 2] += velocities[i * 3 + 2];
+
+                        velocities[i * 3] *= 0.98;
+                        velocities[i * 3 + 2] *= 0.98;
+
+                        sizes[i] *= 1.01;
+                        opacities[i] *= 0.97;
+                        lifetimes[i] -= 0.016;
+                    }
+                }
+
+                wakeParticles.geometry.attributes.position.needsUpdate = true;
+                wakeParticles.geometry.attributes.size.needsUpdate = true;
+                wakeParticles.geometry.attributes.opacity.needsUpdate = true;
+                wakeParticles.geometry.attributes.lifetime.needsUpdate = true;
+            }
+
+            function animate() {
+                
+                requestAnimationFrame(animate);
+
+                updateShipFloating();
+                updateWakeParticles(); 
+
+                if (water.material.uniforms["time"]) {
+                    water.material.uniforms["time"].value += 0.003;
+                }
+
+                renderer.render(scene, camera);
+            }
+            function fadeUpText() {
+                document.querySelector('.coming-soon').classList.add('active');
+            }
+        </script>
+
+        <div class="coming-soon neon-text" data-text="coming soon">
+            COMING SOON
+        </div>
+    </body>
 </html>
